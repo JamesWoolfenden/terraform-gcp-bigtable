@@ -19,8 +19,8 @@ resource "google_bigtable_instance" "bigtable_instance" {
   }
 
   labels = var.labels
-}
-
-variable "kms_key_id" {
-  type = string
+  //should be check
+  lifecycle {
+    prevent_destroy = true
+  }
 }
