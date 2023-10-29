@@ -45,8 +45,6 @@ No modules.
 |------|------|
 | [google_bigtable_instance.bigtable_instance](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/bigtable_instance) | resource |
 | [google_bigtable_table.bigtable_table](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/bigtable_table) | resource |
-| [google_kms_crypto_key.bigtable_kms_crypto_key](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/kms_crypto_key) | resource |
-| [google_kms_crypto_key_iam_binding.bigtable_crypto_key_binding](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/kms_crypto_key_iam_binding) | resource |
 | [google_project_iam_member.bigtable_user](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_member) | resource |
 | [google_project_iam_member.publisher](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_member) | resource |
 | [google_service_account.bigtable](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/service_account) | resource |
@@ -61,12 +59,10 @@ No modules.
 | <a name="input_deletion_protection"></a> [deletion\_protection](#input\_deletion\_protection) | n/a | `bool` | `true` | no |
 | <a name="input_instance_display_name"></a> [instance\_display\_name](#input\_instance\_display\_name) | n/a | `string` | n/a | yes |
 | <a name="input_instance_name"></a> [instance\_name](#input\_instance\_name) | n/a | `string` | n/a | yes |
-| <a name="input_key_ring"></a> [key\_ring](#input\_key\_ring) | n/a | `any` | n/a | yes |
+| <a name="input_kms_key_id"></a> [kms\_key\_id](#input\_kms\_key\_id) | n/a | `string` | n/a | yes |
 | <a name="input_labels"></a> [labels](#input\_labels) | n/a | `map(any)` | n/a | yes |
-| <a name="input_members"></a> [members](#input\_members) | n/a | `list(string)` | n/a | yes |
 | <a name="input_name"></a> [name](#input\_name) | n/a | `string` | n/a | yes |
 | <a name="input_project_id"></a> [project\_id](#input\_project\_id) | n/a | `string` | n/a | yes |
-| <a name="input_rotation_period"></a> [rotation\_period](#input\_rotation\_period) | n/a | `string` | n/a | yes |
 | <a name="input_tables"></a> [tables](#input\_tables) | n/a | <pre>list(object({<br>    name          = string<br>    column_family = string<br>  }))</pre> | n/a | yes |
 
 ## Outputs
@@ -87,11 +83,14 @@ resource "google_project_iam_custom_role" "terraform_pike" {
   title       = "terraform_pike"
   description = "A user with least privileges"
   permissions = [
-    "cloudkms.cryptoKeyVersions.destroy",
-    "cloudkms.cryptoKeyVersions.list",
-    "cloudkms.cryptoKeys.create",
-    "cloudkms.cryptoKeys.get",
-    "cloudkms.cryptoKeys.update",
+    "bigtable.clusters.list",
+    "bigtable.instances.create",
+    "bigtable.instances.delete",
+    "bigtable.instances.get",
+    "bigtable.instances.update",
+    "bigtable.tables.create",
+    "bigtable.tables.delete",
+    "bigtable.tables.get",
     "iam.serviceAccounts.create",
     "iam.serviceAccounts.delete",
     "iam.serviceAccounts.get",

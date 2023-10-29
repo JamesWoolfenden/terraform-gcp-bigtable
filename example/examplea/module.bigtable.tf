@@ -3,9 +3,6 @@ module "bigtable" {
   name                  = "pike"
   instance_display_name = "pike instance"
   instance_name         = "pike"
-  members = [
-    "serviceAccount:service-${data.google_project.current.number}@gcp-sa-bigtable.iam.gserviceaccount.com"
-  ]
   tables = [
     {
       name          = "pangpt"
@@ -29,15 +26,21 @@ module "bigtable" {
   }
   account_id          = "svc-bigtable-user"
   account_name        = "Service Account for BigTable"
-  key_ring            = data.google_kms_key_ring.current.id
+  kms_key_id          = google_kms_crypto_key.bigtable_kms_crypto_key.id
   project_id          = "pike-gcp"
-  rotation_period     = "7776000s"
   deletion_protection = false
+  labels              = local.labels
+}
+
+
+locals {
+  members = [
+    "serviceAccount:service-${data.google_project.current.number}@gcp-sa-bigtable.iam.gserviceaccount.com"
+  ]
   labels = {
     pike = "permissions"
   }
 }
-
 
 data "google_kms_key_ring" "current" {
   project  = "pike-gcp"

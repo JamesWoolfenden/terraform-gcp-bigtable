@@ -9,7 +9,7 @@ resource "google_bigtable_instance" "bigtable_instance" {
     cluster_id   = var.cluster.cluster_id
     storage_type = var.cluster.storage_type
     zone         = var.cluster.zone
-    kms_key_name = google_kms_crypto_key.bigtable_kms_crypto_key.id
+    kms_key_name = var.kms_key_id
     autoscaling_config {
       min_nodes      = var.cluster.autoscaling_config.min_nodes
       max_nodes      = var.cluster.autoscaling_config.max_nodes
@@ -21,12 +21,6 @@ resource "google_bigtable_instance" "bigtable_instance" {
   labels = var.labels
 }
 
-variable "instance_name" {
-  type        = string
-  description = ""
-}
-
-variable "instance_display_name" {
-  type        = string
-  description = ""
+variable "kms_key_id" {
+  type = string
 }

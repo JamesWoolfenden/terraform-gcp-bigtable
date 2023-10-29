@@ -1,9 +1,7 @@
-
 resource "google_service_account" "bigtable" {
   account_id   = var.account_id
   display_name = var.account_name
 }
-
 
 resource "google_project_iam_member" "bigtable_user" {
   project = var.project_id

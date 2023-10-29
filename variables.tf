@@ -1,8 +1,3 @@
-variable "members" {
-  type        = list(string)
-  description = ""
-}
-
 variable "tables" {
   type = list(object({
     name          = string
@@ -46,11 +41,6 @@ variable "labels" {
   description = ""
 }
 
-variable "rotation_period" {
-  type        = string
-  description = ""
-}
-
 variable "name" {
   type        = string
   description = ""
@@ -59,4 +49,18 @@ variable "name" {
 variable "deletion_protection" {
   type    = bool
   default = true
+}
+
+variable "instance_name" {
+  type        = string
+  description = ""
+}
+
+variable "instance_display_name" {
+  type        = string
+  description = ""
+}
+
+variable "kms_key_id" {
+  type = string
 }
