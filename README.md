@@ -29,7 +29,7 @@ No requirements.
 ## Providers
 
 | Name | Version |
-|------|---------|
+| ---- | ------- |
 | <a name="provider_google"></a> [google](#provider\_google) | n/a |
 
 ## Modules
@@ -39,7 +39,7 @@ No modules.
 ## Resources
 
 | Name | Type |
-|------|------|
+| ---- | ---- |
 | [google_bigtable_instance.bigtable_instance](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/bigtable_instance) | resource |
 | [google_bigtable_table.bigtable_table](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/bigtable_table) | resource |
 | [google_project_iam_member.bigtable_user](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_member) | resource |
@@ -49,10 +49,10 @@ No modules.
 ## Inputs
 
 | Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
+| ---- | ----------- | ---- | ------- | :------: |
 | <a name="input_account_id"></a> [account\_id](#input\_account\_id) | n/a | `string` | n/a | yes |
 | <a name="input_account_name"></a> [account\_name](#input\_account\_name) | n/a | `string` | n/a | yes |
-| <a name="input_cluster"></a> [cluster](#input\_cluster) | n/a | <pre>object({<br>    cluster_id   = string<br>    storage_type = string<br>    zone         = string<br>    autoscaling_config = object({<br>      min_nodes      = number<br>      max_nodes      = number<br>      cpu_target     = string<br>      storage_target = string<br>    })<br><br>  })</pre> | n/a | yes |
+| <a name="input_cluster"></a> [cluster](#input\_cluster) | n/a | <pre>object({<br/>    cluster_id   = string<br/>    storage_type = string<br/>    zone         = string<br/>    autoscaling_config = object({<br/>      min_nodes      = number<br/>      max_nodes      = number<br/>      cpu_target     = string<br/>      storage_target = string<br/>    })<br/><br/>  })</pre> | n/a | yes |
 | <a name="input_deletion_protection"></a> [deletion\_protection](#input\_deletion\_protection) | n/a | `bool` | `true` | no |
 | <a name="input_instance_display_name"></a> [instance\_display\_name](#input\_instance\_display\_name) | n/a | `string` | n/a | yes |
 | <a name="input_instance_name"></a> [instance\_name](#input\_instance\_name) | n/a | `string` | n/a | yes |
@@ -60,7 +60,7 @@ No modules.
 | <a name="input_labels"></a> [labels](#input\_labels) | n/a | `map(any)` | n/a | yes |
 | <a name="input_name"></a> [name](#input\_name) | n/a | `string` | n/a | yes |
 | <a name="input_project_id"></a> [project\_id](#input\_project\_id) | n/a | `string` | n/a | yes |
-| <a name="input_tables"></a> [tables](#input\_tables) | n/a | <pre>list(object({<br>    name          = string<br>    column_family = string<br>  }))</pre> | n/a | yes |
+| <a name="input_tables"></a> [tables](#input\_tables) | n/a | <pre>list(object({<br/>    name          = string<br/>    column_family = string<br/>  }))</pre> | n/a | yes |
 
 ## Outputs
 

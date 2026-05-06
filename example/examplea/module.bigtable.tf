@@ -42,7 +42,7 @@ locals {
   }
 }
 
-data "google_kms_key_ring" "current" {
+resource "google_kms_key_ring" "current" {
   project  = var.project
   location = "europe-west2"
   name     = "pike"

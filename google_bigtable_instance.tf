@@ -1,4 +1,5 @@
 resource "google_bigtable_instance" "bigtable_instance" {
+  #checkov:skip=CKV_GCP_122: deletion_protection is configurable via variable
   project             = var.project_id
   name                = var.instance_name
   display_name        = var.instance_display_name
