@@ -27,7 +27,7 @@ module "bigtable" {
   account_id          = "svc-bigtable-user"
   account_name        = "Service Account for BigTable"
   kms_key_id          = google_kms_crypto_key.bigtable_kms_crypto_key.id
-  project_id          = "pike-gcp"
+  project_id          = var.project
   deletion_protection = false
   labels              = local.labels
 }
@@ -43,11 +43,11 @@ locals {
 }
 
 data "google_kms_key_ring" "current" {
-  project  = "pike-gcp"
+  project  = var.project
   location = "europe-west2"
   name     = "pike"
 }
 
 data "google_project" "current" {
-  project_id = "pike-gcp"
+  project_id = var.project
 }
