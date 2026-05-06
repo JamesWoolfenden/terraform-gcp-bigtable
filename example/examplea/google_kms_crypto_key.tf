@@ -1,6 +1,6 @@
 resource "google_kms_crypto_key" "bigtable_kms_crypto_key" {
   name            = "pike"
-  key_ring        = data.google_kms_key_ring.current.id
+  key_ring        = google_kms_key_ring.current.id
   rotation_period = "7776000s"
   labels          = local.labels
 
