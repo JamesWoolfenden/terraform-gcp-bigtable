@@ -1,4 +1,4 @@
-resource "google_bigtable_instance" "bigtable_instance" {
+resource "google_bigtable_instance" "pike" {
   #checkov:skip=CKV_GCP_122: deletion_protection is configurable via variable
   project             = var.project_id
   name                = var.instance_name
@@ -19,7 +19,6 @@ resource "google_bigtable_instance" "bigtable_instance" {
     }
   }
 
-  labels = var.labels
   //should be check
   lifecycle {
     prevent_destroy = true

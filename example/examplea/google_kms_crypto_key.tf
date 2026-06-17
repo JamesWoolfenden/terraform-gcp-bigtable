@@ -1,8 +1,8 @@
 resource "google_kms_crypto_key" "bigtable_kms_crypto_key" {
-  name            = "pike"
-  key_ring        = google_kms_key_ring.current.id
+  name     = "pike"
+  key_ring = google_kms_key_ring.current.id
+
   rotation_period = "7776000s"
-  labels          = local.labels
 
   lifecycle {
     prevent_destroy = true

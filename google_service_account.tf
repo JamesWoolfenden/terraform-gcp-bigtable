@@ -1,16 +1,16 @@
 resource "google_service_account" "bigtable" {
+  project      = var.project_id
   account_id   = var.account_id
   display_name = var.account_name
 }
 
-resource "google_project_iam_member" "bigtable_user" {
-  project = var.project_id
-  role    = "roles/bigtable.user"
-  member  = "serviceAccount:${google_service_account.bigtable.email}"
-}
 
-resource "google_project_iam_member" "publisher" {
-  project = var.project_id
-  role    = "roles/pubsub.publisher"
-  member  = "serviceAccount:${google_service_account.bigtable.email}"
+resource "google_bigtable_table_iam_binding" "editor" {
+  for_each      = google_bigtable_table.table_resource
+  table         = each.value.name
+  instance_name = google_bigtable_instance.pike.name
+  role          = "roles/bigtable.user"
+  members = [
+    "serviceAccount:${google_service_account.bigtable.email}",
+  ]
 }

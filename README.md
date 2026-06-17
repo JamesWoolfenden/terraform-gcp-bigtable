@@ -40,31 +40,32 @@ No modules.
 
 | Name | Type |
 | ---- | ---- |
-| [google_bigtable_instance.bigtable_instance](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/bigtable_instance) | resource |
-| [google_bigtable_table.bigtable_table](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/bigtable_table) | resource |
-| [google_project_iam_member.bigtable_user](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_member) | resource |
-| [google_project_iam_member.publisher](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_member) | resource |
+| [google_bigtable_instance.pike](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/bigtable_instance) | resource |
+| [google_bigtable_table.table_resource](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/bigtable_table) | resource |
+| [google_bigtable_table_iam_binding.editor](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/bigtable_table_iam_binding) | resource |
 | [google_service_account.bigtable](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/service_account) | resource |
 
 ## Inputs
 
 | Name | Description | Type | Default | Required |
 | ---- | ----------- | ---- | ------- | :------: |
-| <a name="input_account_id"></a> [account\_id](#input\_account\_id) | n/a | `string` | n/a | yes |
-| <a name="input_account_name"></a> [account\_name](#input\_account\_name) | n/a | `string` | n/a | yes |
-| <a name="input_cluster"></a> [cluster](#input\_cluster) | n/a | <pre>object({<br/>    cluster_id   = string<br/>    storage_type = string<br/>    zone         = string<br/>    autoscaling_config = object({<br/>      min_nodes      = number<br/>      max_nodes      = number<br/>      cpu_target     = string<br/>      storage_target = string<br/>    })<br/><br/>  })</pre> | n/a | yes |
-| <a name="input_deletion_protection"></a> [deletion\_protection](#input\_deletion\_protection) | n/a | `bool` | `true` | no |
-| <a name="input_instance_display_name"></a> [instance\_display\_name](#input\_instance\_display\_name) | n/a | `string` | n/a | yes |
-| <a name="input_instance_name"></a> [instance\_name](#input\_instance\_name) | n/a | `string` | n/a | yes |
-| <a name="input_kms_key_id"></a> [kms\_key\_id](#input\_kms\_key\_id) | n/a | `string` | n/a | yes |
-| <a name="input_labels"></a> [labels](#input\_labels) | n/a | `map(any)` | n/a | yes |
-| <a name="input_name"></a> [name](#input\_name) | n/a | `string` | n/a | yes |
-| <a name="input_project_id"></a> [project\_id](#input\_project\_id) | n/a | `string` | n/a | yes |
-| <a name="input_tables"></a> [tables](#input\_tables) | n/a | <pre>list(object({<br/>    name          = string<br/>    column_family = string<br/>  }))</pre> | n/a | yes |
+| <a name="input_account_id"></a> [account\_id](#input\_account\_id) | Account identifier (must not be empty) | `string` | n/a | yes |
+| <a name="input_account_name"></a> [account\_name](#input\_account\_name) | Account name (must not be empty) | `string` | n/a | yes |
+| <a name="input_cluster"></a> [cluster](#input\_cluster) | Cluste Object | <pre>object({<br/>    cluster_id   = string<br/>    storage_type = string<br/>    zone         = string<br/>    autoscaling_config = object({<br/>      min_nodes      = number<br/>      max_nodes      = number<br/>      cpu_target     = string<br/>      storage_target = string<br/>    })<br/><br/>  })</pre> | n/a | yes |
+| <a name="input_deletion_protection"></a> [deletion\_protection](#input\_deletion\_protection) | Whether to enable deletion protection for the Bigtable instance | `bool` | `true` | no |
+| <a name="input_instance_display_name"></a> [instance\_display\_name](#input\_instance\_display\_name) | Bigtable instance display name | `string` | n/a | yes |
+| <a name="input_instance_name"></a> [instance\_name](#input\_instance\_name) | Bigtable instance name | `string` | n/a | yes |
+| <a name="input_kms_key_id"></a> [kms\_key\_id](#input\_kms\_key\_id) | KMS key resource id (e.g. projects/PROJECT/locations/LOCATION/keyRings/KEYRING/cryptoKeys/KEY). | `string` | n/a | yes |
+| <a name="input_project_id"></a> [project\_id](#input\_project\_id) | GCP project ID | `string` | n/a | yes |
+| <a name="input_tables"></a> [tables](#input\_tables) | List of Bigtable tables to create | <pre>list(object({<br/>    name          = string<br/>    column_family = string<br/>  }))</pre> | n/a | yes |
 
 ## Outputs
 
-No outputs.
+| Name | Description |
+| ---- | ----------- |
+| <a name="output_instance"></a> [instance](#output\_instance) | The instance details |
+| <a name="output_sa"></a> [sa](#output\_sa) | Service account for bigtable |
+| <a name="output_table"></a> [table](#output\_table) | The Big table instance details |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 
 ## Role and Permissions
@@ -89,12 +90,12 @@ resource "google_project_iam_custom_role" "terraform_pike" {
     "bigtable.tables.create",
     "bigtable.tables.delete",
     "bigtable.tables.get",
+    "bigtable.tables.getIamPolicy",
+    "bigtable.tables.setIamPolicy",
     "iam.serviceAccounts.create",
     "iam.serviceAccounts.delete",
     "iam.serviceAccounts.get",
-    "iam.serviceAccounts.update",
-    "resourcemanager.projects.getIamPolicy",
-    "resourcemanager.projects.setIamPolicy"
+    "iam.serviceAccounts.update"
   ]
 }
 

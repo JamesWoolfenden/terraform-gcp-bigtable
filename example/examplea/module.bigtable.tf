@@ -1,7 +1,6 @@
 # holden:ignore:HLD_TF_026 — examples intentionally use ../../ to reference the local module root
 module "bigtable" {
   source                = "../../"
-  name                  = "pike"
   instance_display_name = "pike instance"
   instance_name         = "pike"
   tables = [
@@ -25,12 +24,10 @@ module "bigtable" {
     storage_type = "SSD"
     zone         = "europe-west2"
   }
-  account_id          = "svc-bigtable-user"
-  account_name        = "Service Account for BigTable"
-  kms_key_id          = google_kms_crypto_key.bigtable_kms_crypto_key.id
-  project_id          = var.project
-  deletion_protection = false
-  labels              = local.labels
+  account_id   = "svc-bigtable-user"
+  account_name = "Service Account for BigTable"
+  kms_key_id   = google_kms_crypto_key.bigtable_kms_crypto_key.id
+  project_id   = var.project
 }
 
 
