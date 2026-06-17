@@ -43,7 +43,9 @@ No modules.
 | [google_bigtable_instance.pike](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/bigtable_instance) | resource |
 | [google_bigtable_table.table_resource](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/bigtable_table) | resource |
 | [google_bigtable_table_iam_binding.editor](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/bigtable_table_iam_binding) | resource |
+| [google_kms_crypto_key_iam_binding.bigtable_crypto_key_binding](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/kms_crypto_key_iam_binding) | resource |
 | [google_service_account.bigtable](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/service_account) | resource |
+| [google_project.current](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/project) | data source |
 
 ## Inputs
 
@@ -92,10 +94,13 @@ resource "google_project_iam_custom_role" "terraform_pike" {
     "bigtable.tables.get",
     "bigtable.tables.getIamPolicy",
     "bigtable.tables.setIamPolicy",
+    "cloudkms.cryptoKeys.getIamPolicy",
+    "cloudkms.cryptoKeys.setIamPolicy",
     "iam.serviceAccounts.create",
     "iam.serviceAccounts.delete",
     "iam.serviceAccounts.get",
-    "iam.serviceAccounts.update"
+    "iam.serviceAccounts.update",
+    "resourcemanager.projects.get"
   ]
 }
 

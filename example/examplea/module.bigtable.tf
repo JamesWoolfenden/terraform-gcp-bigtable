@@ -30,22 +30,8 @@ module "bigtable" {
   project_id   = var.project
 }
 
-
-locals {
-  members = [
-    "serviceAccount:service-${data.google_project.current.number}@gcp-sa-bigtable.iam.gserviceaccount.com"
-  ]
-  labels = {
-    pike = "permissions"
-  }
-}
-
 resource "google_kms_key_ring" "current" {
   project  = var.project
   location = "europe-west2"
   name     = "pike"
-}
-
-data "google_project" "current" {
-  project_id = var.project
 }
