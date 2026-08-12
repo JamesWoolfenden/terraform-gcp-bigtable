@@ -1,0 +1,40 @@
+{
+  "findings": [
+    {
+      "confidence": "high",
+      "explanation": "variable \"kms_key_id\" was marked sensitive = true this session. It flows into google_bigtable_instance.pike's cluster.kms_key_name argument, which marks that resource attribute sensitive in Terraform's state/plan. output \"instance\" exports the whole google_bigtable_instance.pike object without sensitive = true, and Terraform refuses to plan/apply any root module output that transitively contains a sensitive value unless the output itself is marked sensitive. This isn't a static-analysis guess: reproduced empirically in this session with an isolated OpenTofu config (var.s sensitive=true -> resource attribute -> unmarked output) and it fails at 'tofu plan' with 'Error: Output refers to sensitive values'. Deterministic holden rules don't catch this because it requires tracing sensitivity from a variable through a resource attribute into a downstream output block's whole-object reference \u2014 a three-hop data-flow analysis, not a single-resource attribute check. Every consumer of this module hits this at plan time, including the module's own example (example/examplea/outputs.tf wraps module.bigtable, which contains .instance, cascading the same error one level up).",
+      "file": "outputs.tf",
+      "first_seen": "2026-07-18",
+      "fix": "output \"instance\" {\n  value       = google_bigtable_instance.pike\n  description = \"The instance details\"\n  sensitive   = true\n}",
+      "fixable": true,
+      "id": "HOLDEN_AI_001",
+      "last_seen": "2026-07-18",
+      "line": 11,
+      "principle": "data-protection",
+      "related_resources": [
+        "variables.tf:88 (variable.kms_key_id, sensitive = true)",
+        "google_bigtable_instance.tf:13 (cluster.kms_key_name = var.kms_key_id)",
+        "example/examplea/outputs.tf:1 (output.bigtable wraps module.bigtable, including .instance)"
+      ],
+      "remediation": "Mark output \"instance\" as sensitive = true in outputs.tf to make the config valid without reverting the deliberate sensitivity on kms_key_id, then propagate the same change to example/examplea/outputs.tf's output \"bigtable\" (it wraps module.bigtable, which now contains a sensitive field). Longer-term alternative worth considering separately: output only the specific non-sensitive fields callers actually need (e.g. output \"instance_id\" { value = google_bigtable_instance.pike.id }) instead of the whole resource object \u2014 this avoids redacting harmless fields like the instance name/id for every consumer, and incidentally also stops surfacing the provider's unrelated 'instance_type is deprecated' warning that showed up on the same output during validation.",
+      "resource": "output.instance",
+      "severity": "HIGH",
+      "status": "fixed",
+      "suppression_reason": null,
+      "title": "output \"instance\" transitively exposes the sensitive kms_key_id, breaking terraform plan for every caller",
+      "unresolved_since": null
+    }
+  ],
+  "scan_date": "2026-07-18T00:00:00Z",
+  "scan_path": ".",
+  "suggested_policies": [
+    {
+      "dsl_extension_note": "Needs a new engine-driven policy type (same shape as the existing `engine: iam_escalation` in policies/gcp/iam/escalation-path.yaml, which bypasses the normal `resources:` per-attribute evaluation for a whole-graph analysis). The new engine ('sensitive_output_leak' or similar) must: (1) collect all `variable` blocks with `sensitive = true` plus any `locals`/resource attributes that inherit sensitivity through direct assignment from those variables; (2) walk the HCL reference graph forward from each sensitive source through resource argument assignments to build a set of 'tainted' resource attribute paths (this taint-propagation walk is the part that doesn't exist anywhere in the current evaluator \u2014 today's `references`/`requires_companion`/`linked_resource` primitives only check for the *existence* of a graph edge, they don't propagate a value-level property like a sensitivity mark across it); (3) for every root-module `output` block without `sensitive = true`, statically resolve whether its `value` expression syntactically references (as a whole object, or a specific attribute) any tainted resource; (4) fail those outputs. This mirrors Terraform's own native plan-time check but performed at parse time without provider credentials.",
+      "issue": "https://github.com/JamesWoolfenden/holden/issues/390",
+      "rationale": "This is a generic Terraform correctness/data-protection footgun, not GCP- or Bigtable-specific: any sensitive variable that flows into a resource attribute and is then re-exported via an un-marked output block breaks 'terraform plan' for every caller. Terraform itself only catches this at plan time (requires provider credentials and a full graph evaluation); a static holden rule would catch it pre-commit, with no credentials needed, which is exactly the fast-feedback gap holden fills relative to CI-only terraform plan. No existing policy in coverage_by_type for google_bigtable_instance, or any *_iam_binding/*_iam_member type touched by this session's review, covers sensitivity data-flow into outputs \u2014 confirmed via grep across the whole policies/ tree for 'sensitive', nothing addresses output-side leakage.",
+      "requires_dsl_extension": true,
+      "yaml": "id: HLD_PROPOSED_002\nname: Sensitive input values must not reach an unmarked output\nprinciple: data-protection\nseverity: HIGH\nengine: sensitive_output_leak\nrationale: |\n  A variable declared `sensitive = true` that flows into a resource argument\n  marks that resource attribute sensitive in Terraform's state and plan. If a\n  root module `output` block references that resource (directly, or as part\n  of the whole resource object) without `sensitive = true` on the output\n  itself, Terraform refuses to plan or apply \u2014 \"Output refers to sensitive\n  values\". This is entirely static and knowable from the configuration alone\n  (variable declarations, resource argument assignments, and output value\n  expressions), so it does not need a real plan against live credentials to\n  catch \u2014 but no per-resource attribute-path rule can express it, since the\n  failure is a taint that flows through the reference graph: sensitive\n  variable -> resource argument -> output value expression.\nremediation: |\n  Either mark the output sensitive to match the intent of the upstream\n  sensitive variable:\n\n    output \"instance\" {\n      value     = google_bigtable_instance.pike\n      sensitive = true\n    }\n\n  or narrow the output to only the specific non-sensitive fields callers\n  need, instead of exporting the whole resource object:\n\n    output \"instance_id\" {\n      value = google_bigtable_instance.pike.id\n    }\n"
+    }
+  ],
+  "suggested_suppressions": []
+}

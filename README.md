@@ -5,7 +5,6 @@
 [![GitHub tag (latest SemVer)](https://img.shields.io/github/tag/JamesWoolfenden/terraform-gcp-bigtable.svg?label=latest)](https://github.com/JamesWoolfenden/terraform-gcp-bigtable/releases/latest)
 ![Terraform Version](https://img.shields.io/badge/tf-%3E%3D0.14.0-blue.svg)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
-[![checkov](https://img.shields.io/badge/checkov-verified-brightgreen)](https://www.checkov.io/)
 
 A working bigtable module with example.
 
@@ -42,8 +41,8 @@ No modules.
 | ---- | ---- |
 | [google_bigtable_instance.pike](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/bigtable_instance) | resource |
 | [google_bigtable_table.table_resource](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/bigtable_table) | resource |
-| [google_bigtable_table_iam_binding.editor](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/bigtable_table_iam_binding) | resource |
-| [google_kms_crypto_key_iam_binding.bigtable_crypto_key_binding](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/kms_crypto_key_iam_binding) | resource |
+| [google_bigtable_table_iam_member.editor](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/bigtable_table_iam_member) | resource |
+| [google_kms_crypto_key_iam_member.bigtable_crypto_key_binding](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/kms_crypto_key_iam_member) | resource |
 | [google_service_account.bigtable](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/service_account) | resource |
 | [google_project.current](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/project) | data source |
 
@@ -53,12 +52,13 @@ No modules.
 | ---- | ----------- | ---- | ------- | :------: |
 | <a name="input_account_id"></a> [account\_id](#input\_account\_id) | Account identifier (must not be empty) | `string` | n/a | yes |
 | <a name="input_account_name"></a> [account\_name](#input\_account\_name) | Account name (must not be empty) | `string` | n/a | yes |
-| <a name="input_cluster"></a> [cluster](#input\_cluster) | Cluste Object | <pre>object({<br/>    cluster_id   = string<br/>    storage_type = string<br/>    zone         = string<br/>    autoscaling_config = object({<br/>      min_nodes      = number<br/>      max_nodes      = number<br/>      cpu_target     = string<br/>      storage_target = string<br/>    })<br/><br/>  })</pre> | n/a | yes |
+| <a name="input_cluster"></a> [cluster](#input\_cluster) | Cluster configuration object | <pre>object({<br/>    cluster_id   = string<br/>    storage_type = string<br/>    zone         = string<br/>    autoscaling_config = object({<br/>      min_nodes      = number<br/>      max_nodes      = number<br/>      cpu_target     = number<br/>      storage_target = number<br/>    })<br/><br/>  })</pre> | n/a | yes |
 | <a name="input_deletion_protection"></a> [deletion\_protection](#input\_deletion\_protection) | Whether to enable deletion protection for the Bigtable instance | `bool` | `true` | no |
 | <a name="input_instance_display_name"></a> [instance\_display\_name](#input\_instance\_display\_name) | Bigtable instance display name | `string` | n/a | yes |
 | <a name="input_instance_name"></a> [instance\_name](#input\_instance\_name) | Bigtable instance name | `string` | n/a | yes |
 | <a name="input_kms_key_id"></a> [kms\_key\_id](#input\_kms\_key\_id) | KMS key resource id (e.g. projects/PROJECT/locations/LOCATION/keyRings/KEYRING/cryptoKeys/KEY). | `string` | n/a | yes |
 | <a name="input_project_id"></a> [project\_id](#input\_project\_id) | GCP project ID | `string` | n/a | yes |
+| <a name="input_replica_clusters"></a> [replica\_clusters](#input\_replica\_clusters) | Optional additional Bigtable clusters for multi-cluster replication (HA). Each entry adds a replica cluster, typically in a different zone/region from var.cluster. Defaults to none (single-cluster). | <pre>list(object({<br/>    cluster_id   = string<br/>    storage_type = string<br/>    zone         = string<br/>    autoscaling_config = object({<br/>      min_nodes      = number<br/>      max_nodes      = number<br/>      cpu_target     = number<br/>      storage_target = number<br/>    })<br/>  }))</pre> | `[]` | no |
 | <a name="input_tables"></a> [tables](#input\_tables) | List of Bigtable tables to create | <pre>list(object({<br/>    name          = string<br/>    column_family = string<br/>  }))</pre> | n/a | yes |
 
 ## Outputs
@@ -76,7 +76,7 @@ No modules.
 The Terraform resource required is:
 
 ```golang
-
+# apply role
 resource "google_project_iam_custom_role" "terraform_pike" {
   project     = "pike-477416"
   role_id     = "terraform_pike"
@@ -100,6 +100,25 @@ resource "google_project_iam_custom_role" "terraform_pike" {
     "iam.serviceAccounts.delete",
     "iam.serviceAccounts.get",
     "iam.serviceAccounts.update",
+    "resourcemanager.projects.get"
+  ]
+}
+
+# plan role
+resource "google_project_iam_custom_role" "terraform_pike_plan" {
+  project     = "pike-477416"
+  role_id     = "terraform_pike_plan"
+  title       = "terraform_pike_plan"
+  description = "A user with least privileges"
+  permissions = [
+    "bigtable.clusters.list",
+    "bigtable.instances.get",
+    "bigtable.instances.list",
+    "bigtable.tables.get",
+    "bigtable.tables.getIamPolicy",
+    "cloudkms.cryptoKeys.getIamPolicy",
+    "iam.serviceAccounts.get",
+    "resourcemanager.organizations.get",
     "resourcemanager.projects.get"
   ]
 }

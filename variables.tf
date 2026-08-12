@@ -36,15 +36,40 @@ variable "cluster" {
     autoscaling_config = object({
       min_nodes      = number
       max_nodes      = number
-      cpu_target     = string
-      storage_target = string
+      cpu_target     = number
+      storage_target = number
     })
 
   })
-  description = "Cluste Object"
+  description = "Cluster configuration object"
   validation {
     condition     = var.cluster.autoscaling_config.min_nodes <= var.cluster.autoscaling_config.max_nodes
     error_message = "cluster.autoscaling_config.min_nodes must be less than or equal to cluster.autoscaling_config.max_nodes"
+  }
+}
+
+# holden:ignore:HLD_TF_037: referenced inside the dynamic "cluster" block's for_each/content in google_bigtable_instance.tf — the reference-usage check doesn't resolve variables used only inside a dynamic block.
+variable "replica_clusters" {
+  type = list(object({
+    cluster_id   = string
+    storage_type = string
+    zone         = string
+    autoscaling_config = object({
+      min_nodes      = number
+      max_nodes      = number
+      cpu_target     = number
+      storage_target = number
+    })
+  }))
+  description = "Optional additional Bigtable clusters for multi-cluster replication (HA). Each entry adds a replica cluster, typically in a different zone/region from var.cluster. Defaults to none (single-cluster)."
+  default     = []
+  validation {
+    condition     = alltrue([for c in var.replica_clusters : c.autoscaling_config.min_nodes <= c.autoscaling_config.max_nodes])
+    error_message = "each replica_clusters entry's autoscaling_config.min_nodes must be less than or equal to autoscaling_config.max_nodes"
+  }
+  validation {
+    condition     = alltrue([for c in var.replica_clusters : c.zone != var.cluster.zone])
+    error_message = "each replica_clusters entry must use a different zone than var.cluster.zone"
   }
 }
 
@@ -85,6 +110,7 @@ variable "instance_display_name" {
 variable "kms_key_id" {
   type        = string
   description = "KMS key resource id (e.g. projects/PROJECT/locations/LOCATION/keyRings/KEYRING/cryptoKeys/KEY)."
+  sensitive   = true
   validation {
     condition     = can(regex("^projects/.+", var.kms_key_id))
     error_message = "kms_key_id must be a valid KMS resource id starting with 'projects/'."

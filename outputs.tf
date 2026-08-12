@@ -11,4 +11,5 @@ output "table" {
 output "instance" {
   value       = google_bigtable_instance.pike
   description = "The instance details"
+  sensitive   = true
 }

@@ -1,0 +1,53 @@
+# Intentionally local, never intended for upstream assignment: the source
+# filter below matches this repo's own "../../" self-reference convention,
+# which is specific to how examples in this repo call the module — an
+# external consumer would reference a registry or git source instead, so
+# this exact filter wouldn't apply there. See the design discussion that
+# led here: HLD_GCP_344 (upstream, evaluates the module's own resource
+# definition) can't resolve cluster count through the dynamic "cluster"
+# block over var.replica_clusters, so it's suppressed at the module root
+# (google_bigtable_instance.tf). This policy checks the module CALL's own
+# literal replica_clusters argument instead — no resolution needed, it's
+# plain HCL at the call site — which is what lets a suppression here (if
+# ever needed) stay scoped to one specific deployment's accepted risk
+# instead of silencing the check for every caller.
+id: HLD_PROPOSED_003
+name: Bigtable module calls should configure multi-cluster replication for HA
+cloud: gcp
+principle: reliability
+severity: MEDIUM
+rationale: |
+  A call to the terraform-gcp-bigtable module that doesn't set
+  replica_clusters gets the module's single-cluster default: no cross-zone
+  replication, no automatic failover. Checking the module call's own
+  replica_clusters argument catches this per call site, unlike a check on
+  the module's own resource definition (see HLD_GCP_344), which can't see
+  through the dynamic "cluster" block this variable feeds.
+remediation: |
+  Set replica_clusters on the module call to add at least one replica
+  cluster in a different zone:
+
+    module "bigtable" {
+      source = "..."
+      # ...
+      replica_clusters = [
+        {
+          cluster_id   = "main-b"
+          zone         = "us-central1-f"
+          storage_type = "SSD"
+          autoscaling_config = {
+            min_nodes      = 1
+            max_nodes      = 1
+            cpu_target     = 80
+            storage_target = 5120
+          }
+        }
+      ]
+    }
+resources:
+  module:
+    filter:
+      path: source
+      matches: "^\\.\\./\\.\\./?$"
+    path: replica_clusters
+    not_empty: true
