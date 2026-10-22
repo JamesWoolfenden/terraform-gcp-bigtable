@@ -1,5 +1,3 @@
-default_language_version:
-    python: python3.11
 repos:
 -   repo: https://github.com/pre-commit/pre-commit-hooks
     rev: 3e8a8703264a2f4a69428a0aa4dcb512790b2c8c # v6.0.0
@@ -39,9 +37,7 @@ repos:
     rev: c5bdf92051a9e574d62152d81a3bd98a71816dd3 # v0.1.62
     hooks:
     -   id: terraform-fmt
-        language_version: python3.11
     -   id: tf2docs
-        language_version: python3.11
 -   repo: https://github.com/jameswoolfenden/pike
     rev: 741f708218a37ce07fa50556298e0a1dace541ac # v1.0.9
     hooks:
