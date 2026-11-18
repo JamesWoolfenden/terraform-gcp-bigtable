@@ -118,7 +118,6 @@ resource "google_project_iam_custom_role" "terraform_pike_plan" {
     "bigtable.tables.getIamPolicy",
     "cloudkms.cryptoKeys.getIamPolicy",
     "iam.serviceAccounts.get",
-    "resourcemanager.organizations.get",
     "resourcemanager.projects.get"
   ]
 }

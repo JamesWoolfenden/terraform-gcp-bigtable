@@ -6,4 +6,3 @@ scan_roots:
     targets: [gha]
   - path: example/examplea
     targets: [terraform]
-    
